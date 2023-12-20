@@ -6,6 +6,9 @@ export class Report {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ default: false }) //by default false
+  approved: boolean; //APPROVED account manually or not
+
   @Column()
   price: number;
 

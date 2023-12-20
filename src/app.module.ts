@@ -15,6 +15,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { buildErrors } from './infrastracture/utils/buildErrors';
 import * as process from 'process';
+import typeorm from './config/typeorm';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -27,19 +28,27 @@ const cookieSession = require('cookie-session');
       //Should be first
       isGlobal: true, //DO not need to reimport,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+      load: [typeorm],
     }),
     TypeOrmModule.forRootAsync({
-      // SHOULD BE ASYNC IF WE USE CONFIG MODULE
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        return {
-          type: 'sqlite', //sqil
-          database: config.get<'string'>('DB_NAME'), //name
-          entities: [User, Report],
-          synchronize: true, //only for first development
-        };
-      },
+      useFactory: async (configService: ConfigService) =>
+        configService.get('typeorm'),
     }),
+    // TypeOrmModule.forRootAsync({
+    //   // SHOULD BE ASYNC IF WE USE CONFIG MODULE
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService) => {
+    //     return {
+    //       type: 'sqlite', //sqil
+    //       database: config.get<'string'>('DB_NAME'), //name
+    //       entities: [User, Report],
+    //       //synchronize: true, //only for first development,
+    //       migrations: ['migrations/*.js'],
+    //       migrationsTableName: 'custom_migration_table',
+    //     };
+    //   },
+    // }),
     // TypeOrmModule.forRoot({
     //   type: 'sqlite', //sqil
     //   database: 'db.sqlite', //name
@@ -66,16 +75,20 @@ const cookieSession = require('cookie-session');
   ],
 })
 export class AppModule {
+  constructor(
+    private dataSource: DataSource,
+    private configService: ConfigService,
+  ) {}
   configure(consumer: MiddlewareConsumer) {
     //This approach is better for testing
     //RUN on every request
+    //GLOBAL MIDDLEWARE
     consumer
       .apply(
         cookieSession({
-          keys: ['1asfjksahjfksahkfashkjfhsjakhfjksahfjkashfj'],
+          keys: [this.configService.get('COOKIE_KEY')],
         }),
       )
       .forRoutes('*'); //GLOBAL middleware for every request
   }
-  constructor(private dataSource: DataSource) {}
 }

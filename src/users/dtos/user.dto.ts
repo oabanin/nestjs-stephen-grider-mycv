@@ -6,4 +6,7 @@ export class UserDto {
 
   @Expose() // Means what is want to share with
   email: string;
+
+  @Expose()
+  admin: boolean;
 }

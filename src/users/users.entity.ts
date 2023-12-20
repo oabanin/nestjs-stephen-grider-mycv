@@ -35,4 +35,8 @@ export class User {
   //@Exclude() //EXCLUDE FROM RESPONSE
   //Better to convert this instanse to special DTO instanse with params that need to be exposed
   password: string;
+
+  //By default all are administrators
+  @Column({ default: true })
+  admin: boolean;
 }

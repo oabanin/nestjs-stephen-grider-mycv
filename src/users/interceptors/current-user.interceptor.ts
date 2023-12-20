@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../users.service';
 
+//BETTER USE MIDDLEWARE FOR CURRENT USER, BECAUSE middleware triggers earlier than INTERCEPTOR
 @Injectable()
 export class CurrentUserInterceptor implements NestInterceptor {
   constructor(private usersService: UsersService) {}

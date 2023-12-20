@@ -12,6 +12,9 @@ import { User } from '../../users/users.entity';
 
 export class ReportDto {
   @Expose() // Means what is want to share with
+  id: number;
+
+  @Expose() // Means what is want to share with
   price: number;
 
   @Expose() // Means what is want to share with
@@ -31,4 +34,13 @@ export class ReportDto {
 
   @Expose() // Means what is want to share with
   mileage: number;
+
+  //GENERATE brandNew
+  //obj is original report entity
+  @Transform(({ obj }) => obj.user.id)
+  @Expose()
+  userId: number;
+
+  @Expose()
+  approved: boolean;
 }
