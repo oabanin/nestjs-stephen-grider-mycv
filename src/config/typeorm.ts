@@ -3,8 +3,9 @@ import { config as dotenvConfig } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { User } from '../users/users.entity';
 import { Report } from '../reports/report.entity';
+import * as process from 'process';
 
-dotenvConfig({ path: '.env' });
+dotenvConfig({ path: `.env.${process.env.NODE_ENV}` });
 
 // const config = {
 //   type: 'postgres',
@@ -20,11 +21,12 @@ dotenvConfig({ path: '.env' });
 // };
 const config = {
   type: 'sqlite', //sqil
-  database: 'db.sqlite', //name
+  database: process.env.DB_NAME, //name
   entities: [User, Report],
-  synchronize: true, //only for first development,
-  migrations: ['migrations/*.ts'],
+  // synchronize: true, //only for first development,
+  migrations: ['/migrations/*.ts'],
   migrationsTableName: 'migrations',
+  migrationsRun: true,
 };
 export default registerAs('typeorm', () => config);
 export const connectionSource = new DataSource(config as DataSourceOptions);
